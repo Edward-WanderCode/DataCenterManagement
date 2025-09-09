@@ -67,9 +67,6 @@ namespace DataCenterManagement.Services
             return result;
         }
 
-        /// <summary>
-        /// Map các bản ghi CaTruc thành 7 dòng hiển thị.
-        /// </summary>
         public static IEnumerable<LichTrucRow> ToRows(IEnumerable<CaTruc> weekWithNames)
         {
             return weekWithNames
@@ -87,8 +84,6 @@ namespace DataCenterManagement.Services
                     };
                 });
         }
-
-        // ------------------ Helpers ------------------
 
         private static IEnumerable<CanBo> OrderByPreferred(IList<CanBo> list)
         {

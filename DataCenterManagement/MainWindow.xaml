@@ -1,4 +1,4 @@
-﻿<Window
+﻿<Window x:Name="Main"
     x:Class="DataCenterManagement.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -14,7 +14,7 @@
     TextElement.Foreground="{DynamicResource MaterialDesignBody}"
     TextOptions.TextFormattingMode="Ideal"
     TextOptions.TextRenderingMode="Auto"
-    WindowStartupLocation="CenterScreen">
+    WindowStartupLocation="CenterScreen" Loaded="Main_Loaded">
 
     <Window.Resources>
         <!--  Style cho TabItem  -->
@@ -97,12 +97,12 @@
                                     FontWeight="Bold"
                                     Text="Thông tin ca trực" />
                                 <WrapPanel>
-                                    <Calendar Width="280" SelectionMode="SingleDate" />
+                                    <Calendar x:Name="Calendar_LichTruc" Width="280" SelectionMode="SingleDate" SelectedDatesChanged="Calendar_LichTruc_SelectedDatesChanged" />
                                     <StackPanel
                                         Margin="10"
                                         VerticalAlignment="Center"
                                         TextBlock.FontSize="16">
-                                        <ComboBox
+                                        <ComboBox x:Name="CboxCaTruc"
                                             Width="320"
                                             Height="60"
                                             Margin="10"

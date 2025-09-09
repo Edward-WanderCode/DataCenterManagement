@@ -8,18 +8,10 @@ using System.IO;
 
 namespace DataCenterManagement.Services
 {
-    /// <summary>
-    /// DatabaseService: SQLite + Dapper cho DataCenterManagement.
-    /// - Chuẩn hoá schema CanBo/ CaTruc.
-    /// - Tự migrate nếu phát hiện cột Id cũ.
-    /// - Bật PRAGMA hợp lý.
-    /// - Hỗ trợ CRUD cơ bản và lịch tuần.
-    /// </summary>
     public class DatabaseService
     {
         private readonly string _dbPath;
 
-        // ---- TypeHandler DateOnly (nội bộ) ----
         private sealed class DateOnlyHandler : SqlMapper.TypeHandler<DateOnly>
         {
             private const string Format = "yyyy-MM-dd";
@@ -46,7 +38,6 @@ namespace DataCenterManagement.Services
             }
         }
 
-        // Đăng ký handler 1 lần cho toàn bộ AppDomain
         static DatabaseService()
         {
             SqlMapper.RemoveTypeMap(typeof(DateOnly));
@@ -137,9 +128,7 @@ namespace DataCenterManagement.Services
             System.Diagnostics.Debug.WriteLine($"[DatabaseService] DB Path: {_dbPath}");
         }
 
-        // ---------- MIGRATIONS & NORMALIZATION ----------
-
-        private void MigrateCanBoIdColumnIfNeeded(SqliteConnection conn)
+        private static void MigrateCanBoIdColumnIfNeeded(SqliteConnection conn)
         {
             var cols = conn.Query<dynamic>("PRAGMA table_info(CanBo);").ToList();
             bool hasIdCanBo = cols.Any(c => string.Equals((string)c.name, "IdCanBo", StringComparison.OrdinalIgnoreCase));
@@ -170,7 +159,7 @@ namespace DataCenterManagement.Services
             tx.Commit();
         }
 
-        private void NormalizeCaTrucDates(SqliteConnection conn)
+        private static void NormalizeCaTrucDates(SqliteConnection conn)
         {
             // Lấy tất cả bản ghi và chuẩn hoá về 'yyyy-MM-dd' nếu cần
             var all = conn.Query<(int IdCaTruc, object NgayTruc)>("SELECT IdCaTruc, NgayTruc FROM CaTruc;").ToList();
@@ -202,8 +191,6 @@ namespace DataCenterManagement.Services
                 System.Diagnostics.Debug.WriteLine("[DatabaseService] Normalized CaTruc.NgayTruc to yyyy-MM-dd.");
         }
 
-        // ---------- CANBO CRUD ----------
-
         public IEnumerable<CanBo> GetCanBoList()
         {
             using var conn = Open();
@@ -234,9 +221,7 @@ namespace DataCenterManagement.Services
             return n > 0;
         }
 
-        // ---------- LỊCH TRỰC / TUẦN ----------
-
-        private static string D(DateOnly d) => d.ToString("yyyy-MM-dd"); // tham số dạng string để chắc chắn
+        private static string D(DateOnly d) => d.ToString("yyyy-MM-dd");
 
         public IEnumerable<CaTruc> GetWeekAssignments(DateOnly monday)
         {

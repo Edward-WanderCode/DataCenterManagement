@@ -13,8 +13,8 @@ namespace DataCenterManagement.ViewModels
         [ObservableProperty]
         private DateOnly startMonday;
 
-        public ObservableCollection<LichTrucRow> WeekRows { get; } = new();
-        public ObservableCollection<CanBo> CanBoList { get; } = new();
+        public ObservableCollection<LichTrucRow> WeekRows { get; } = [];
+        public ObservableCollection<CanBo> CanBoList { get; } = [];
 
         public LichTrucViewModel()
         {

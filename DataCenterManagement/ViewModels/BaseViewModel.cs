@@ -1,8 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using System;
 using System.Diagnostics;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows; // để dùng Application.Current?.Dispatcher
 
 namespace DataCenterManagement.ViewModels
@@ -40,12 +37,14 @@ namespace DataCenterManagement.ViewModels
         /// <summary>
         /// Gọi khi view xuất hiện (tuỳ view gọi thủ công).
         /// </summary>
-        public virtual void OnAppearing() { }
+        public virtual void OnAppearing()
+        { }
 
         /// <summary>
         /// Gọi khi view biến mất (tuỳ view gọi thủ công).
         /// </summary>
-        public virtual void OnDisappearing() { }
+        public virtual void OnDisappearing()
+        { }
 
         /// <summary>
         /// Thiết lập nhanh Status (kèm Debug).
@@ -91,7 +90,7 @@ namespace DataCenterManagement.ViewModels
         /// <summary>
         /// Đảm bảo chạy trên UI thread (Dispatcher).
         /// </summary>
-        protected Task RunOnUiAsync(Action action)
+        protected static Task RunOnUiAsync(Action action)
         {
             var dispatcher = Application.Current?.Dispatcher;
             if (dispatcher == null || dispatcher.CheckAccess())
