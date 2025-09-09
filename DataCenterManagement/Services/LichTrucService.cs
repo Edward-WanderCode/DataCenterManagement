@@ -1,32 +1,60 @@
-﻿using DataCenterManagement.Models;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using DataCenterManagement.Models;
 
 namespace DataCenterManagement.Services
 {
     public static class LichTrucService
     {
+        // Neo "Tuần N" = tuần bắt đầu Thứ 2, 01/09/2025 (đúng lịch mẫu bạn đưa).
+        private static readonly DateOnly AnchorMonday = new(2025, 9, 1);
+
+        // Thứ tự chuẩn 7 người theo mẫu
+        private static readonly string[] PreferredOrder =
+        {
+            "Nguyễn Hồ Hoàng Hiệp",
+            "Nguyễn Tiến Phát",
+            "Nguyễn Sinh Trung",
+            "Lê Tự Minh Hoàng",
+            "Nguyễn Hữu Ngọc Trung",
+            "Hoàng Hồng Quân",
+            "Trương Trọng Khang"
+        };
+
         /// <summary>
         /// Sinh lịch 7 ngày bắt đầu từ thứ 2 (monday).
-        /// Danh sách cán bộ sẽ xoay vòng từng cặp (2 người/ngày).
+        /// Quy tắc:
+        ///  - Thứ tự người: PreferredOrder (nếu thiếu tên sẽ bỏ qua; tên lạ sẽ thêm vào cuối theo ABC).
+        ///  - Ngày i ghép: (idx = start+i) và (idx-1) theo vòng tròn → (Người_i, Người_(i-1)).
+        ///  - start = số tuần chênh lệch so với AnchorMonday (mod n).
         /// </summary>
-        public static IEnumerable<CaTruc> GenerateWeek(DateOnly monday, IList<CanBo> canBoList)
+        public static IEnumerable<CaTruc> GenerateWeek(DateOnly monday, IList<CanBo> rawCanBoList)
         {
-            if (canBoList == null || canBoList.Count < 2)
+            if (rawCanBoList == null || rawCanBoList.Count < 2)
                 throw new InvalidOperationException("Cần tối thiểu 2 cán bộ để phân lịch.");
 
-            // Xây vòng quay theo cặp: ngày i dùng (index 2*i, 2*i+1) dạng vòng tròn
-            var n = canBoList.Count;
-            var result = new List<CaTruc>();
+            // 1) Sắp xếp danh sách cán bộ theo PreferredOrder; người không có trong danh sách mẫu sẽ xếp cuối theo tên.
+            var ordered = OrderByPreferred(rawCanBoList).ToList();
+            int n = ordered.Count;
+            if (n < 2) throw new InvalidOperationException("Cần tối thiểu 2 cán bộ để phân lịch.");
 
+            // 2) Tính start index theo tuần (mod n)
+            int weekOffset = GetIsoWeeksBetween(AnchorMonday, monday); // chênh lệch tuần (>=,<= đều được)
+            int start = Mod(weekOffset, n);
+
+            // 3) Sinh 7 ngày: (idx, idx-1)
+            var result = new List<CaTruc>(7 * 2);
             for (int i = 0; i < 7; i++)
             {
+                int idx1 = Mod(start + i, n);           // Người 1 (Ca13)
+                int idx2 = Mod(start + i - 1, n);       // Người 2 (Ca24)
+
                 var d = monday.AddDays(i);
-                var idx1 = (2 * i) % n;
-                var idx2 = (2 * i + 1) % n;
+                var cb1 = ordered[idx1];
+                var cb2 = ordered[idx2];
 
-                var cb1 = canBoList[idx1];
-                var cb2 = canBoList[idx2];
-
-                // Người 1 -> Ca13
+                // Người 1 -> Ca13 (Ca1 & Ca3)
                 result.Add(new CaTruc
                 {
                     NgayTruc = d,
@@ -34,7 +62,7 @@ namespace DataCenterManagement.Services
                     IdCanBo = cb1.IdCanBo
                 });
 
-                // Người 2 -> Ca24
+                // Người 2 -> Ca24 (Ca2 & Ca4; cuối tuần Ca4 gộp vào ban đêm)
                 result.Add(new CaTruc
                 {
                     NgayTruc = d,
@@ -44,38 +72,6 @@ namespace DataCenterManagement.Services
             }
 
             return result;
-        }
-
-        /// <summary>
-        /// Helper: Lấy mô tả khung giờ theo ngày/nhóm ca (tham khảo hiển thị nếu cần).
-        /// </summary>
-        public static string GetTimeRange(DateOnly date, string nhomCa)
-        {
-            // Thứ: Monday=1 ... Sunday=7 theo ISO
-            var dow = (int)date.DayOfWeek;
-            if (dow == 0) dow = 7;
-            bool weekend = (dow == 6 || dow == 7);
-
-            if (!weekend)
-            {
-                // T2 - T6
-                return nhomCa switch
-                {
-                    "Ca13" => "Ca1: 07:30-10:30; Ca3: 14:30-17:30",
-                    "Ca24" => "Ca2: 10:30-14:30; Ca4: 17:30-07:30(+1)",
-                    _ => ""
-                };
-            }
-            else
-            {
-                // T7 - CN
-                return nhomCa switch
-                {
-                    "Ca13" => "Ca1: 07:30-11:30; Ca3: 17:30-07:30(+1)",
-                    "Ca24" => "Ca2: 11:30-17:30",
-                    _ => ""
-                };
-            }
         }
 
         /// <summary>
@@ -97,6 +93,61 @@ namespace DataCenterManagement.Services
                         TenCa24 = ca24?.TenCanBo
                     };
                 });
+        }
+
+        // ------------------ Helpers ------------------
+
+        private static IEnumerable<CanBo> OrderByPreferred(IList<CanBo> list)
+        {
+            // Tạo map tên -> index ưu tiên
+            var prefIndex = new Dictionary<string, int>(StringComparer.InvariantCultureIgnoreCase);
+            for (int i = 0; i < PreferredOrder.Length; i++)
+                prefIndex[PreferredOrder[i]] = i;
+
+            // 1) Lấy các tên có trong danh sách mẫu, giữ đúng thứ tự mẫu
+            var inPref = list
+                .Where(cb => prefIndex.ContainsKey(cb.HoTen))
+                .OrderBy(cb => prefIndex[cb.HoTen])
+                .ToList();
+
+            // 2) Các tên còn lại (không nằm trong mẫu): xếp cuối theo alphabet để vẫn quay được
+            var others = list
+                .Where(cb => !prefIndex.ContainsKey(cb.HoTen))
+                .OrderBy(cb => cb.HoTen, StringComparer.CurrentCultureIgnoreCase)
+                .ToList();
+
+            // Ghép lại
+            foreach (var cb in inPref) yield return cb;
+            foreach (var cb in others) yield return cb;
+        }
+
+        private static int Mod(int a, int m)
+        {
+            int r = a % m;
+            return r < 0 ? r + m : r;
+        }
+
+        /// <summary>
+        /// Số tuần chênh lệch giữa hai Monday theo chuẩn ISO (mỗi block 7 ngày).
+        /// Ta quy về Monday của mỗi ngày rồi chia 7.
+        /// </summary>
+        private static int GetIsoWeeksBetween(DateOnly anchorMonday, DateOnly monday)
+        {
+            // Quy cả hai về Monday thực sự
+            var aMon = ToMonday(anchorMonday);
+            var bMon = ToMonday(monday);
+
+            int days = bMon.DayNumber - aMon.DayNumber;
+            return days / 7;
+        }
+
+        private static DateOnly ToMonday(DateOnly date)
+        {
+            // Monday=1..Sunday=7 (ISO). DateOnly.DayOfWeek: Monday=1..Sunday=0 (enum)
+            int dow = (int)date.DayOfWeek;
+            if (dow == 0) dow = 7; // Sunday -> 7
+            int delta = dow - 1;   // move back to Monday
+            return date.AddDays(-delta);
         }
     }
 }
