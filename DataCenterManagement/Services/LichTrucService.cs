@@ -22,13 +22,6 @@ namespace DataCenterManagement.Services
             "Trương Trọng Khang"
         };
 
-        /// <summary>
-        /// Sinh lịch 7 ngày bắt đầu từ thứ 2 (monday).
-        /// Quy tắc:
-        ///  - Thứ tự người: PreferredOrder (nếu thiếu tên sẽ bỏ qua; tên lạ sẽ thêm vào cuối theo ABC).
-        ///  - Ngày i ghép: (idx = start+i) và (idx-1) theo vòng tròn → (Người_i, Người_(i-1)).
-        ///  - start = số tuần chênh lệch so với AnchorMonday (mod n).
-        /// </summary>
         public static IEnumerable<CaTruc> GenerateWeek(DateOnly monday, IList<CanBo> rawCanBoList)
         {
             if (rawCanBoList == null || rawCanBoList.Count < 2)
@@ -127,10 +120,6 @@ namespace DataCenterManagement.Services
             return r < 0 ? r + m : r;
         }
 
-        /// <summary>
-        /// Số tuần chênh lệch giữa hai Monday theo chuẩn ISO (mỗi block 7 ngày).
-        /// Ta quy về Monday của mỗi ngày rồi chia 7.
-        /// </summary>
         private static int GetIsoWeeksBetween(DateOnly anchorMonday, DateOnly monday)
         {
             // Quy cả hai về Monday thực sự
