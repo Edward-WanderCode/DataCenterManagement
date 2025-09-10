@@ -8,8 +8,7 @@
     xmlns:views="clr-namespace:DataCenterManagement.Views"
     x:Name="Main"
     Title="Phần mềm quản lý trực NOC"
-    Width="1500"
-    Height="800"
+    Width="Auto"
     Background="{DynamicResource MaterialDesignPaper}"
     FontFamily="{DynamicResource MaterialDesignFont}"
     TextElement.FontSize="13"
@@ -30,6 +29,9 @@
             <Setter Property="FontWeight" Value="Medium" />
         </Style>
     </Window.Resources>
+    <Window.DataContext>
+        <viewmodels:LichTrucViewModel />
+    </Window.DataContext>
 
     <Grid>
         <Grid.ColumnDefinitions>
@@ -91,60 +93,19 @@
 
             <!--  Tab: Thông tin ca trực  -->
             <TabItem Header="THÔNG TIN CA TRỰC" Style="{StaticResource CustomTabItem}">
-                <Grid Margin="20">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="*" />
-                    </Grid.RowDefinitions>
-
+                <Grid Margin="20" VerticalAlignment="Center">
                     <materialDesign:Card
                         Grid.Row="0"
                         Margin="0,0,0,16"
                         Padding="16">
-                        <WrapPanel>
+                        <StackPanel Orientation="Horizontal">
                             <StackPanel>
                                 <TextBlock
                                     Margin="0,0,0,16"
                                     FontSize="18"
                                     FontWeight="Bold"
                                     Text="Thông tin ca trực" />
-                                <WrapPanel>
-                                    <Calendar
-                                        x:Name="Calendar_LichTruc"
-                                        Width="280"
-                                        SelectedDate="{Binding NgayTruc}"
-                                        SelectedDatesChanged="Calendar_LichTruc_SelectedDatesChanged"
-                                        SelectionMode="SingleDate" />
-                                    <StackPanel
-                                        Margin="10"
-                                        VerticalAlignment="Center"
-                                        TextBlock.FontSize="16">
-                                        <ComboBox
-                                            x:Name="CboxCaTruc"
-                                            Width="320"
-                                            Height="60"
-                                            Margin="10"
-                                            materialDesign:HintAssist.Hint="Ca trực" />
-                                        <ComboBox
-                                            Width="320"
-                                            Height="60"
-                                            Margin="10"
-                                            materialDesign:HintAssist.Hint="Cán bộ trực"
-                                            DisplayMemberPath="HoTen"
-                                            ItemsSource="{Binding CanBoList}"
-                                            SelectedValue="{Binding SelectedCanBoId, Mode=TwoWay}"
-                                            SelectedValuePath="IdCanBo" />
-                                        <ComboBox
-                                            Width="320"
-                                            Height="60"
-                                            Margin="10"
-                                            materialDesign:HintAssist.Hint="Cán bộ trực ca tiếp theo"
-                                            DisplayMemberPath="HoTen"
-                                            ItemsSource="{Binding CanBoList}"
-                                            SelectedValue="{Binding SelectedNextCanBoId, Mode=TwoWay}"
-                                            SelectedValuePath="IdCanBo" />
-                                    </StackPanel>
-                                </WrapPanel>
+                                <views:CaTrucView />
                             </StackPanel>
                             <StackPanel>
                                 <TextBlock
@@ -152,9 +113,9 @@
                                     FontSize="18"
                                     FontWeight="Bold"
                                     Text="Lịch trực tuần" />
-                                <views:LichTrucView Width="746" />
+                                <views:LichTrucView />
                             </StackPanel>
-                        </WrapPanel>
+                        </StackPanel>
                     </materialDesign:Card>
                 </Grid>
             </TabItem>

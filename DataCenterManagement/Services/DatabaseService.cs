@@ -103,12 +103,6 @@ namespace DataCenterManagement.Services
 
             conn.Execute("CREATE INDEX IF NOT EXISTS IX_CaTruc_Ngay_Nhom ON CaTruc(NgayTruc, NhomCa);");
 
-            // 2) Migrate bảng CanBo nếu còn cột Id cũ
-            MigrateCanBoIdColumnIfNeeded(conn);
-
-            // 3) Chuẩn hoá dữ liệu CaTruc.NgayTruc về TEXT yyyy-MM-dd
-            NormalizeCaTrucDates(conn);
-
             // 4) Seed
             if (firstCreate)
             {
@@ -128,74 +122,13 @@ namespace DataCenterManagement.Services
             System.Diagnostics.Debug.WriteLine($"[DatabaseService] DB Path: {_dbPath}");
         }
 
-        private static void MigrateCanBoIdColumnIfNeeded(SqliteConnection conn)
-        {
-            var cols = conn.Query<dynamic>("PRAGMA table_info(CanBo);").ToList();
-            bool hasIdCanBo = cols.Any(c => string.Equals((string)c.name, "IdCanBo", StringComparison.OrdinalIgnoreCase));
-            bool hasId = cols.Any(c => string.Equals((string)c.name, "Id", StringComparison.OrdinalIgnoreCase));
-
-            if (hasIdCanBo) return; // OK
-            if (!hasId) return;     // không có cả 2 -> thôi
-
-            using var tx = conn.BeginTransaction();
-
-            conn.Execute("""
-                CREATE TABLE IF NOT EXISTS CanBo_new (
-                    IdCanBo INTEGER PRIMARY KEY AUTOINCREMENT,
-                    HoTen   TEXT NOT NULL
-                );
-            """, transaction: tx);
-
-            // Sao chép dữ liệu, giữ nguyên giá trị khoá
-            conn.Execute("""
-                INSERT INTO CanBo_new (IdCanBo, HoTen)
-                SELECT Id, HoTen FROM CanBo;
-            """, transaction: tx);
-
-            conn.Execute("ALTER TABLE CanBo RENAME TO CanBo_old;", transaction: tx);
-            conn.Execute("ALTER TABLE CanBo_new RENAME TO CanBo;", transaction: tx);
-            conn.Execute("DROP TABLE IF EXISTS CanBo_old;", transaction: tx);
-
-            tx.Commit();
-        }
-
-        private static void NormalizeCaTrucDates(SqliteConnection conn)
-        {
-            // Lấy tất cả bản ghi và chuẩn hoá về 'yyyy-MM-dd' nếu cần
-            var all = conn.Query<(int IdCaTruc, object NgayTruc)>("SELECT IdCaTruc, NgayTruc FROM CaTruc;").ToList();
-            if (all.Count == 0) return;
-
-            bool needUpdate = false;
-            foreach (var row in all)
-            {
-                string? s = row.NgayTruc as string;
-
-                if (s == null || s.Length != 10 || s[4] != '-' || s[7] != '-')
-                {
-                    // Không đúng format → cố gắng parse
-                    DateOnly d;
-                    if (row.NgayTruc is DateTime dt)
-                        d = DateOnly.FromDateTime(dt);
-                    else if (row.NgayTruc is string s2 && DateOnly.TryParse(s2, out var d2))
-                        d = d2;
-                    else
-                        continue;
-
-                    conn.Execute("UPDATE CaTruc SET NgayTruc = @v WHERE IdCaTruc = @id;",
-                        new { v = d.ToString("yyyy-MM-dd"), id = row.IdCaTruc });
-                    needUpdate = true;
-                }
-            }
-
-            if (needUpdate)
-                System.Diagnostics.Debug.WriteLine("[DatabaseService] Normalized CaTruc.NgayTruc to yyyy-MM-dd.");
-        }
-
         public IEnumerable<CanBo> GetCanBoList()
         {
             using var conn = Open();
             return conn.Query<CanBo>("SELECT IdCanBo, HoTen FROM CanBo ORDER BY HoTen;");
         }
+
+        #region Cơ sở dữ liệu Cán bộ
 
         public int AddCanBo(string hoTen)
         {
@@ -220,6 +153,8 @@ namespace DataCenterManagement.Services
             var n = conn.Execute("DELETE FROM CanBo WHERE IdCanBo=@Id;", new { Id = idCanBo });
             return n > 0;
         }
+
+        #endregion Cơ sở dữ liệu Cán bộ
 
         private static string D(DateOnly d) => d.ToString("yyyy-MM-dd");
 
@@ -256,7 +191,7 @@ namespace DataCenterManagement.Services
             return conn.QueryFirstOrDefault<CaTruc>(sql, new { ngay = D(ngay), nhom = nhomCa });
         }
 
-        private static (DateOnly ngayTiep, string nhomCaTiep) NextShift(DateOnly ngay, string nhomCa)
+        public (DateOnly ngayTiep, string nhomCaTiep) NextShift(DateOnly ngay, string nhomCa)
         {
             // [Suy luận] logic mặc định: Ca13 -> Ca24 same day; Ca24 -> Ca13 next day
             if (string.Equals(nhomCa, "Ca13", StringComparison.OrdinalIgnoreCase))

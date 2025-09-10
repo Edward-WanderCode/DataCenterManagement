@@ -11,51 +11,7 @@ namespace DataCenterManagement.ViewModels
     {
         private readonly DatabaseService _db = db ?? throw new ArgumentNullException(nameof(db));
 
-        public ObservableCollection<CanBo> CanBoList { get; } = new ObservableCollection<CanBo>();
-
-        private int? _selectedCanBoId;
-
-        public int? SelectedCanBoId
-        {
-            get => _selectedCanBoId;
-            set
-            {
-                if (_selectedCanBoId == value) return;
-                _selectedCanBoId = value;
-                OnPropertyChanged();
-                SelectedCanBo = CanBoList.FirstOrDefault(c => c.IdCanBo == value);
-            }
-        }
-
-        private int? _selectedNextCanBoId;
-
-        public int? SelectedNextCanBoId
-        {
-            get => _selectedNextCanBoId;
-            set
-            {
-                if (value == _selectedNextCanBoId) return;
-                _selectedNextCanBoId = value;
-                OnPropertyChanged();
-                SelectedNextCanBo = CanBoList.FirstOrDefault(c => c.IdCanBo == value);
-            }
-        }
-
-        private CanBo? _selectedCanBo;
-
-        public CanBo? SelectedCanBo
-        {
-            get => _selectedCanBo;
-            set { _selectedCanBo = value; OnPropertyChanged(); }
-        }
-
-        private CanBo? _selectedNextCanBo;
-
-        public CanBo? SelectedNextCanBo
-        {
-            get => _selectedNextCanBo;
-            set { _selectedNextCanBo = value; OnPropertyChanged(); }
-        }
+        public ObservableCollection<CanBo> CanBoList { get; } = [];
 
         public async Task LoadCanBoAsync()
         {
@@ -72,7 +28,6 @@ namespace DataCenterManagement.ViewModels
             if (string.IsNullOrWhiteSpace(hoTen)) return 0;
             var id = await Task.Run(() => _db.AddCanBo(hoTen.Trim()));
             await LoadCanBoAsync();
-            SelectedCanBoId = id;
             return id;
         }
 

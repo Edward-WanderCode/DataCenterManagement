@@ -1,0 +1,59 @@
+﻿<UserControl
+    x:Class="DataCenterManagement.Views.CaTrucView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="clr-namespace:DataCenterManagement.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewmodels="clr-namespace:DataCenterManagement.ViewModels"
+    mc:Ignorable="d">
+
+    <UserControl.DataContext>
+        <viewmodels:CaTrucViewModel />
+    </UserControl.DataContext>
+    <UserControl.Resources>
+        <converters:DateOnlyToDateTimeConverter x:Key="DateOnlyToDateTimeConverter" />
+    </UserControl.Resources>
+    <Grid>
+        <WrapPanel>
+            <Calendar
+                x:Name="Calendar_CaTruc"
+                Width="300"
+                SelectedDate="{Binding SelectedNgayTruc, Converter={StaticResource DateOnlyToDateTimeConverter}}"
+                SelectedDatesChanged="Calendar_CaTruc_SelectedDatesChanged"
+                SelectionMode="SingleDate" />
+            <StackPanel
+                Margin="10"
+                VerticalAlignment="Center"
+                TextBlock.FontSize="16">
+                <ComboBox
+                    x:Name="CboxCaTruc"
+                    Width="320"
+                    Height="60"
+                    Margin="10"
+                    materialDesign:HintAssist.Hint="Ca trực"
+                    ItemsSource="{Binding CaTrucOptions}"
+                    SelectedIndex="{Binding SelectedCaTrucIndex, Mode=TwoWay}" />
+                <ComboBox
+                    Width="320"
+                    Height="60"
+                    Margin="10"
+                    materialDesign:HintAssist.Hint="Cán bộ trực"
+                    DisplayMemberPath="HoTen"
+                    ItemsSource="{Binding CanBoList}"
+                    SelectedValue="{Binding SelectedCanBoId, Mode=TwoWay}"
+                    SelectedValuePath="IdCanBo" />
+                <ComboBox
+                    Width="320"
+                    Height="60"
+                    Margin="10"
+                    materialDesign:HintAssist.Hint="Cán bộ trực ca tiếp theo"
+                    DisplayMemberPath="HoTen"
+                    ItemsSource="{Binding CanBoList}"
+                    SelectedValue="{Binding SelectedNextCanBoId, Mode=TwoWay}"
+                    SelectedValuePath="IdCanBo" />
+            </StackPanel>
+        </WrapPanel>
+    </Grid>
+</UserControl>
