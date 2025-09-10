@@ -1,4 +1,7 @@
-﻿using System.IO;
+﻿using DataCenterManagement.Services;
+using DataCenterManagement.ViewModels;
+using System.IO;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace DataCenterManagement
@@ -8,9 +11,22 @@ namespace DataCenterManagement
     /// </summary>
     public partial class MainWindow : Window
     {
+        private readonly CanBoViewModel _vm;
         public MainWindow()
         {
             InitializeComponent();
+
+            var db = new DatabaseService();
+            _vm = new CanBoViewModel(db);
+            DataContext = _vm;
+
+            Loaded += MainWindow_LoadedAsync;
+        }
+
+        private async void MainWindow_LoadedAsync(object sender, RoutedEventArgs e)
+        {
+            Calendar_LichTruc.SelectedDate = DateTime.Now;
+            await _vm.LoadCanBoAsync();
         }
 
         private void Calendar_LichTruc_SelectedDatesChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
@@ -46,11 +62,6 @@ namespace DataCenterManagement
                 ];
             }
             CboxCaTruc.ItemsSource = caItems;
-        }
-
-        private void Main_Loaded(object sender, RoutedEventArgs e)
-        {
-            Calendar_LichTruc.SelectedDate = DateTime.Now;
         }
     }
 } 

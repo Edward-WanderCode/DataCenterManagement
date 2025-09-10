@@ -73,11 +73,11 @@
                 <DataGridTextColumn
                     Width="*"
                     Binding="{Binding TenCa13}"
-                    Header="Tên cán bộ trực Ca13" />
+                    Header="Cán bộ trực Ca 1 - 3" />
                 <DataGridTextColumn
                     Width="*"
                     Binding="{Binding TenCa24}"
-                    Header="Tên cán bộ trực Ca24" />
+                    Header="Cán bộ trực Ca 2 - 4" />
             </DataGrid.Columns>
         </DataGrid>
     </Grid>

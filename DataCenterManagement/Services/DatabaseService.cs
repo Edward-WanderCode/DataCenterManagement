@@ -244,6 +244,31 @@ namespace DataCenterManagement.Services
             return conn.Query<CaTruc>(sql, new { from = D(monday), to = D(sunday) });
         }
 
+        public CaTruc? GetAssignment(DateOnly ngay, string nhomCa)
+        {
+            using var conn = Open();
+            var sql = @"
+                SELECT ct.IdCaTruc, ct.NgayTruc, ct.NhomCa, ct.IdCanBo, cb.HoTen AS TenCanBo
+                FROM CaTruc ct
+                LEFT JOIN CanBo cb ON cb.IdCanBo = ct.IdCanBo
+                WHERE ct.NgayTruc = @ngay AND ct.NhomCa = @nhom;
+            ";
+            return conn.QueryFirstOrDefault<CaTruc>(sql, new { ngay = D(ngay), nhom = nhomCa });
+        }
+
+        private static (DateOnly ngayTiep, string nhomCaTiep) NextShift(DateOnly ngay, string nhomCa)
+        {
+            // [Suy luận] logic mặc định: Ca13 -> Ca24 same day; Ca24 -> Ca13 next day
+            if (string.Equals(nhomCa, "Ca13", StringComparison.OrdinalIgnoreCase))
+                return (ngay, "Ca24");
+
+            if (string.Equals(nhomCa, "Ca24", StringComparison.OrdinalIgnoreCase))
+                return (ngay.AddDays(1), "Ca13");
+
+            // [Chưa xác minh] fallback: assume next is same nhomCa next day
+            return (ngay.AddDays(1), nhomCa);
+        }
+
         public void UpsertWeekAssignments(DateOnly monday, IEnumerable<CaTruc> items)
         {
             if (items == null) return;
