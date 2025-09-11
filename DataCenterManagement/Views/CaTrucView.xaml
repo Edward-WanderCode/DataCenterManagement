@@ -29,14 +29,14 @@
                 TextBlock.FontSize="16">
                 <ComboBox
                     x:Name="CboxCaTruc"
-                    Width="320"
+                    Width="250"
                     Height="60"
                     Margin="10"
                     materialDesign:HintAssist.Hint="Ca trực"
                     ItemsSource="{Binding CaTrucOptions}"
                     SelectedIndex="{Binding SelectedCaTrucIndex, Mode=TwoWay}" />
                 <ComboBox
-                    Width="320"
+                    Width="250"
                     Height="60"
                     Margin="10"
                     materialDesign:HintAssist.Hint="Cán bộ trực"
@@ -45,7 +45,7 @@
                     SelectedValue="{Binding SelectedCanBoId, Mode=TwoWay}"
                     SelectedValuePath="IdCanBo" />
                 <ComboBox
-                    Width="320"
+                    Width="250"
                     Height="60"
                     Margin="10"
                     materialDesign:HintAssist.Hint="Cán bộ trực ca tiếp theo"

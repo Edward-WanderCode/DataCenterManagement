@@ -8,7 +8,6 @@
     xmlns:views="clr-namespace:DataCenterManagement.Views"
     x:Name="Main"
     Title="Phần mềm quản lý trực NOC"
-    Width="Auto"
     Background="{DynamicResource MaterialDesignPaper}"
     FontFamily="{DynamicResource MaterialDesignFont}"
     TextElement.FontSize="13"
@@ -29,16 +28,8 @@
             <Setter Property="FontWeight" Value="Medium" />
         </Style>
     </Window.Resources>
-    <Window.DataContext>
-        <viewmodels:LichTrucViewModel />
-    </Window.DataContext>
 
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="221*" />
-            <ColumnDefinition Width="20*" />
-            <ColumnDefinition Width="1259*" />
-        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
@@ -85,31 +76,30 @@
         <TabControl
             Grid.Row="1"
             Grid.RowSpan="2"
-            Grid.ColumnSpan="3"
-            Margin="0,0,0,46"
             materialDesign:ColorZoneAssist.Mode="PrimaryMid"
             Style="{StaticResource MaterialDesignFilledTabControl}"
             TabStripPlacement="Top">
 
             <!--  Tab: Thông tin ca trực  -->
             <TabItem Header="THÔNG TIN CA TRỰC" Style="{StaticResource CustomTabItem}">
-                <Grid Margin="20" VerticalAlignment="Center">
-                    <materialDesign:Card
-                        Grid.Row="0"
-                        Margin="0,0,0,16"
-                        Padding="16">
-                        <StackPanel Orientation="Horizontal">
+                <StackPanel Margin="20,20,20,75" Orientation="Horizontal">
+                    <materialDesign:Card Margin="0,0,5,0">
+                        <StackPanel Margin="10,0,0,0">
                             <StackPanel>
                                 <TextBlock
-                                    Margin="0,0,0,16"
+                                    Margin="10"
                                     FontSize="18"
                                     FontWeight="Bold"
                                     Text="Thông tin ca trực" />
                                 <views:CaTrucView />
                             </StackPanel>
+                        </StackPanel>
+                    </materialDesign:Card>
+                    <materialDesign:Card>
+                        <StackPanel>
                             <StackPanel>
                                 <TextBlock
-                                    Margin="0,0,0,16"
+                                    Margin="10"
                                     FontSize="18"
                                     FontWeight="Bold"
                                     Text="Lịch trực tuần" />
@@ -117,7 +107,7 @@
                             </StackPanel>
                         </StackPanel>
                     </materialDesign:Card>
-                </Grid>
+                </StackPanel>
             </TabItem>
 
             <!--  Tab: Tình hình chung  -->

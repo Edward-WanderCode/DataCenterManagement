@@ -5,6 +5,7 @@ using SQLitePCL;
 using System.Data;
 using System.Globalization;
 using System.IO;
+using System.Windows;
 
 namespace DataCenterManagement.Services
 {
@@ -95,6 +96,7 @@ namespace DataCenterManagement.Services
                 CREATE TABLE IF NOT EXISTS CaTruc (
                     IdCaTruc INTEGER PRIMARY KEY AUTOINCREMENT,
                     NgayTruc TEXT NOT NULL,   -- format yyyy-MM-dd
+                    DisplayName TEXT NOT NULL DEFAULT 'Ca 1',
                     NhomCa   TEXT NOT NULL,   -- 'Ca13' | 'Ca24'
                     IdCanBo  INTEGER NOT NULL,
                     FOREIGN KEY(IdCanBo) REFERENCES CanBo(IdCanBo)
@@ -191,17 +193,18 @@ namespace DataCenterManagement.Services
             return conn.QueryFirstOrDefault<CaTruc>(sql, new { ngay = D(ngay), nhom = nhomCa });
         }
 
-        public (DateOnly ngayTiep, string nhomCaTiep) NextShift(DateOnly ngay, string nhomCa)
+        public (DateOnly ngayTruc, string nhomCa) NextShift(DateOnly ngayTruc, string caTruc)
         {
-            // [Suy luận] logic mặc định: Ca13 -> Ca24 same day; Ca24 -> Ca13 next day
-            if (string.Equals(nhomCa, "Ca13", StringComparison.OrdinalIgnoreCase))
-                return (ngay, "Ca24");
+            bool isWeekend = ngayTruc.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday;
 
-            if (string.Equals(nhomCa, "Ca24", StringComparison.OrdinalIgnoreCase))
-                return (ngay.AddDays(1), "Ca13");
-
-            // [Chưa xác minh] fallback: assume next is same nhomCa next day
-            return (ngay.AddDays(1), nhomCa);
+            return caTruc switch
+            {
+                "Ca 1" => (ngayTruc, "Ca24"),
+                "Ca 2" => (ngayTruc, "Ca13"),
+                "Ca 3" when isWeekend => (ngayTruc.AddDays(1), "Ca13"),
+                "Ca 3" => (ngayTruc, "Ca24"),
+                _ => (ngayTruc.AddDays(1), "Ca13")
+            };
         }
 
         public void UpsertWeekAssignments(DateOnly monday, IEnumerable<CaTruc> items)
@@ -217,12 +220,13 @@ namespace DataCenterManagement.Services
                 new { from = D(monday), to = D(sunday) }, tx);
 
             // Insert mới
-            const string ins = "INSERT INTO CaTruc(NgayTruc, NhomCa, IdCanBo) VALUES (@NgayTruc, @NhomCa, @IdCanBo);";
+            const string ins = "INSERT INTO CaTruc(NgayTruc, DisplayName, NhomCa, IdCanBo) VALUES (@NgayTruc, @DisplayName, @NhomCa, @IdCanBo);";
             foreach (var it in items)
             {
                 conn.Execute(ins, new
                 {
                     NgayTruc = D(it.NgayTruc),
+                    it.DisplayName,
                     it.NhomCa,
                     it.IdCanBo
                 }, tx);

@@ -4,6 +4,7 @@
     {
         public int IdCaTruc { get; set; }
         public DateOnly NgayTruc { get; set; }
+        public string DisplayName { get; set; } = "Ca 1";
         public string NhomCa { get; set; } = "Ca13";
         public int IdCanBo { get; set; }
         public string? TenCanBo { get; set; }

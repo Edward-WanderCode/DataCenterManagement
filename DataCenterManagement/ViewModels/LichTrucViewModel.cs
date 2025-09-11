@@ -2,7 +2,12 @@
 using CommunityToolkit.Mvvm.Input;
 using DataCenterManagement.Models;
 using DataCenterManagement.Services;
+using DocumentFormat.OpenXml.Wordprocessing;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.IO;
+using System.Windows;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace DataCenterManagement.ViewModels
 {
@@ -15,63 +20,6 @@ namespace DataCenterManagement.ViewModels
 
         public ObservableCollection<LichTrucRow> WeekRows { get; } = [];
         public ObservableCollection<CanBo> CanBoList { get; } = [];
-
-        private DateOnly _selectedNgayTruc;
-
-        public DateOnly SelectedNgayTruc
-        {
-            get => _selectedNgayTruc;
-            set
-            {
-                if (_selectedNgayTruc == value) return;
-                _selectedNgayTruc = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private int? _selectedCanBoId;
-
-        public int? SelectedCanBoId
-        {
-            get => _selectedCanBoId;
-            set
-            {
-                if (_selectedCanBoId == value) return;
-                _selectedCanBoId = value;
-                OnPropertyChanged();
-                SelectedCanBo = CanBoList.FirstOrDefault(c => c.IdCanBo == value);
-            }
-        }
-
-        private int? _selectedNextCanBoId;
-
-        public int? SelectedNextCanBoId
-        {
-            get => _selectedNextCanBoId;
-            set
-            {
-                if (value == _selectedNextCanBoId) return;
-                _selectedNextCanBoId = value;
-                OnPropertyChanged();
-                SelectedNextCanBo = CanBoList.FirstOrDefault(c => c.IdCanBo == value);
-            }
-        }
-
-        private CanBo? _selectedCanBo;
-
-        public CanBo? SelectedCanBo
-        {
-            get => _selectedCanBo;
-            set { _selectedCanBo = value; OnPropertyChanged(); }
-        }
-
-        private CanBo? _selectedNextCanBo;
-
-        public CanBo? SelectedNextCanBo
-        {
-            get => _selectedNextCanBo;
-            set { _selectedNextCanBo = value; OnPropertyChanged(); }
-        }
 
         public LichTrucViewModel()
         {
@@ -132,6 +80,57 @@ namespace DataCenterManagement.ViewModels
             var generated = LichTrucService.GenerateWeek(StartMonday, [.. CanBoList]);
             _db.UpsertWeekAssignments(StartMonday, generated);
             LoadWeek();
+        }
+
+        [RelayCommand]
+        private async Task ExportWord()
+        {
+            var TemplatesFolderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Templates");
+            var LichTrucFolderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "LichTruc");
+            if (!Directory.Exists(TemplatesFolderPath))
+            {
+                Directory.CreateDirectory(TemplatesFolderPath);
+            }
+            if (!Directory.Exists(LichTrucFolderPath))
+            {
+                Directory.CreateDirectory(LichTrucFolderPath);
+            }
+            try
+            {
+                var fileName = $"LichTruc_{StartMonday:yyyyMMdd}.docx";
+                var outPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "LichTruc", fileName);
+                var templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Templates", "lich_truc_template.docx");
+                var rowsSnapshot = WeekRows.ToList();
+                await Task.Run(() =>
+                {
+                    WordExporter.ExportWeekToWord_AtBookmark_Formatted(templatePath, outPath, "LichTruc", rowsSnapshot);
+                    WordExporter.SetDateBookmarks(outPath);
+                });
+                System.Windows.Application.Current?.Dispatcher.Invoke(() =>
+                {
+                    var action = MessageBox.Show($"Xuất file thành công:\n{outPath}", "Hoàn tất", MessageBoxButton.OK, MessageBoxImage.Information);
+                    if (action == MessageBoxResult.OK)
+                    {
+                        try
+                        {
+                            var psi = new ProcessStartInfo
+                            {
+                                FileName = outPath,
+                                UseShellExecute = true // important on .NET Core/5+ to open with default app
+                            };
+                            Process.Start(psi);
+                        }
+                        catch (Exception)
+                        {
+
+                            throw;
+                        }
+                    }
+                });
+            }
+            catch (Exception)
+            {
+            }
         }
 
         private static DateOnly GetThisWeekMonday(DateTime today)

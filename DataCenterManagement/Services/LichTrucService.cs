@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using DataCenterManagement.Models;
+﻿using DataCenterManagement.Models;
 
 namespace DataCenterManagement.Services
 {
@@ -51,6 +48,14 @@ namespace DataCenterManagement.Services
                 result.Add(new CaTruc
                 {
                     NgayTruc = d,
+                    DisplayName = "Ca 1",
+                    NhomCa = "Ca13",
+                    IdCanBo = cb1.IdCanBo
+                });
+                result.Add(new CaTruc
+                {
+                    NgayTruc = d,
+                    DisplayName = "Ca 3",
                     NhomCa = "Ca13",
                     IdCanBo = cb1.IdCanBo
                 });
@@ -59,9 +64,20 @@ namespace DataCenterManagement.Services
                 result.Add(new CaTruc
                 {
                     NgayTruc = d,
+                    DisplayName = "Ca 2",
                     NhomCa = "Ca24",
                     IdCanBo = cb2.IdCanBo
                 });
+                if (d.DayOfWeek != DayOfWeek.Saturday || d.DayOfWeek != DayOfWeek.Sunday)
+                {
+                    result.Add(new CaTruc
+                    {
+                        NgayTruc = d,
+                        DisplayName = "Ca 4",
+                        NhomCa = "Ca24",
+                        IdCanBo = cb2.IdCanBo
+                    });
+                }
             }
 
             return result;

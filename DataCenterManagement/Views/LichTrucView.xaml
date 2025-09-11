@@ -4,9 +4,10 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:DataCenterManagement.Converters"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="clr-namespace:DataCenterManagement.ViewModels"
-    Width="800"
+    Width="775"
     mc:Ignorable="d">
 
     <!--  Nếu bạn đã tạo DateTimeConverter như mình gợi ý trước đó  -->
@@ -18,15 +19,9 @@
         <vm:LichTrucViewModel />
     </UserControl.DataContext>
 
-    <Grid Margin="16">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
-
+    <StackPanel Margin="16">
         <!--  Header controls: dùng DockPanel + Margin để tạo khoảng cách, không dùng Spacing  -->
-        <DockPanel LastChildFill="False">
+        <DockPanel HorizontalAlignment="Center" LastChildFill="False">
             <Button
                 Margin="0,0,8,0"
                 Command="{Binding PrevWeekCommand}"
@@ -36,12 +31,12 @@
                 Command="{Binding NextWeekCommand}"
                 Content="Tuần sau ⟶" />
             <TextBlock
-                Margin="8,0,4,0"
+                Margin="8,0,4,8"
                 VerticalAlignment="Center"
                 Text="Bắt đầu từ (thứ 2):" />
             <DatePicker
                 Width="160"
-                Margin="0,0,8,0"
+                Margin="0,0,8,8"
                 SelectedDate="{Binding StartMonday, Mode=TwoWay, Converter={StaticResource DateOnlyToDateTimeConverter}}" />
             <Button
                 Margin="8,0,0,0"
@@ -52,9 +47,11 @@
         <!--  Khung giờ tham khảo  -->
         <Border
             Grid.Row="1"
-            Margin="0,8,0,8"
-            Padding="8"
-            BorderBrush="#444"
+            Width="675"
+            Margin="10,10,0,10"
+            Padding="10"
+            HorizontalAlignment="Center"
+            BorderBrush="Beige"
             BorderThickness="1"
             CornerRadius="6" />
 
@@ -68,18 +65,33 @@
             ItemsSource="{Binding WeekRows}">
             <DataGrid.Columns>
                 <DataGridTextColumn
-                    Width="150"
+                    Width="1*"
                     Binding="{Binding Ngay, StringFormat=\{0:dd/MM/yyyy\}}"
                     Header="Ngày" />
                 <DataGridTextColumn
-                    Width="*"
+                    Width="2*"
                     Binding="{Binding TenCa13}"
                     Header="Cán bộ trực Ca 1 - 3" />
                 <DataGridTextColumn
-                    Width="*"
+                    Width="2*"
                     Binding="{Binding TenCa24}"
                     Header="Cán bộ trực Ca 2 - 4" />
             </DataGrid.Columns>
         </DataGrid>
-    </Grid>
+        <Button
+            Width="215"
+            Margin="10,10,0,10"
+            HorizontalAlignment="Right"
+            Command="{Binding ExportWordCommand}">
+            <StackPanel Orientation="Horizontal">
+                <materialDesign:PackIcon
+                    Width="20"
+                    Height="20"
+                    Margin="0,0,10,0"
+                    Kind="FileExport" />
+                <TextBlock Text="Xuất file work lịch trực" />
+            </StackPanel>
+        </Button>
+
+    </StackPanel>
 </UserControl>

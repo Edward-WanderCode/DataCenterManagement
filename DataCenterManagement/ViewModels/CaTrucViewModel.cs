@@ -11,6 +11,7 @@ namespace DataCenterManagement.ViewModels
         private int _selectedCanBoId;
         private int _selectedNextCanBoId;
         private string _nhomCa = "Ca13";
+        private string _displayName = "Ca 1";
 
         public IEnumerable<CanBo> CanBoList { get; set; }
 
@@ -87,19 +88,22 @@ namespace DataCenterManagement.ViewModels
                 {
                     _selectedCaTrucIndex = value;
                     OnPropertyChanged();
-                    UpdateNhomCaFromIndex();
+                    UpdateCaTrucFromIndex();
                     UpdateCanBoFromSchedule();
                 }
             }
         }
 
-        private void UpdateNhomCaFromIndex()
+        private void UpdateCaTrucFromIndex()
         {
-            if (_selectedCaTrucIndex >= 0)
-            {
-                // Index 0 và 2 -> Ca13, Index 1 và 3 -> Ca24
-                NhomCa = (_selectedCaTrucIndex == 0 || _selectedCaTrucIndex == 2) ? "Ca13" : "Ca24";
-            }
+            if (_selectedCaTrucIndex < 0) return;
+
+            var names = new[] { "Ca 1", "Ca 2", "Ca 3", "Ca 4" };
+            if (_selectedCaTrucIndex < names.Length)
+                DisplayName = names[_selectedCaTrucIndex];
+
+            // Theo chú thích: index chẵn -> Ca13, lẻ -> Ca24
+            NhomCa = (_selectedCaTrucIndex % 2 == 0) ? "Ca13" : "Ca24";
         }
 
         public int SelectedCanBoId
@@ -141,13 +145,26 @@ namespace DataCenterManagement.ViewModels
             }
         }
 
+        public string DisplayName
+        {
+            get => _displayName;
+            set
+            {
+                if (_displayName != value)
+                {
+                    _displayName = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         private void UpdateCanBoFromSchedule()
         {
             if (_selectedNgayTruc != default && _selectedCaTrucIndex >= 0)
             {
                 var canBoId = FindCanBoTruc(_selectedNgayTruc, _nhomCa);
                 SelectedCanBoId = canBoId;
-                var nextCanBoId = FindNextCanBoTruc(_selectedNgayTruc, _nhomCa);
+                var nextCanBoId = FindNextCanBoTruc(_selectedNgayTruc, _displayName);
                 SelectedNextCanBoId = nextCanBoId;
             }
         }
@@ -158,9 +175,9 @@ namespace DataCenterManagement.ViewModels
             return caTruc?.IdCanBo ?? 0;
         }
 
-        private int FindNextCanBoTruc(DateOnly ngayTruc, string nhomCa)
+        private int FindNextCanBoTruc(DateOnly ngayTruc, string ca)
         {
-            CaTruc? caTruc = _db.GetAssignment(_db.NextShift(ngayTruc, nhomCa).ngayTiep, _db.NextShift(ngayTruc, nhomCa).nhomCaTiep);
+            CaTruc? caTruc = _db.GetAssignment(_db.NextShift(ngayTruc, ca).ngayTruc, _db.NextShift(ngayTruc, ca).nhomCa);
             return caTruc?.IdCanBo ?? 0;
         }
     }

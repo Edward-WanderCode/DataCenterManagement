@@ -1,0 +1,74 @@
+<svg width="256" height="256" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="128" cy="128" r="120" fill="#1e40af" stroke="#1d4ed8" stroke-width="4"/>
+  
+  <!-- Server rack frame -->
+  <rect x="60" y="40" width="136" height="176" rx="8" ry="8" fill="#374151" stroke="#4b5563" stroke-width="2"/>
+  
+  <!-- Server units -->
+  <!-- Server 1 -->
+  <rect x="70" y="55" width="116" height="20" rx="3" ry="3" fill="#6b7280"/>
+  <rect x="75" y="58" width="10" height="14" rx="2" ry="2" fill="#10b981"/>
+  <rect x="90" y="60" width="6" height="10" rx="1" ry="1" fill="#ef4444"/>
+  <rect x="100" y="60" width="6" height="10" rx="1" ry="1" fill="#10b981"/>
+  <rect x="110" y="60" width="6" height="10" rx="1" ry="1" fill="#10b981"/>
+  <rect x="160" y="58" width="20" height="14" rx="2" ry="2" fill="#1f2937"/>
+  
+  <!-- Server 2 -->
+  <rect x="70" y="80" width="116" height="20" rx="3" ry="3" fill="#6b7280"/>
+  <rect x="75" y="83" width="10" height="14" rx="2" ry="2" fill="#10b981"/>
+  <rect x="90" y="85" width="6" height="10" rx="1" ry="1" fill="#10b981"/>
+  <rect x="100" y="85" width="6" height="10" rx="1" ry="1" fill="#10b981"/>
+  <rect x="110" y="85" width="6" height="10" rx="1" ry="1" fill="#f59e0b"/>
+  <rect x="160" y="83" width="20" height="14" rx="2" ry="2" fill="#1f2937"/>
+  
+  <!-- Server 3 -->
+  <rect x="70" y="105" width="116" height="20" rx="3" ry="3" fill="#6b7280"/>
+  <rect x="75" y="108" width="10" height="14" rx="2" ry="2" fill="#10b981"/>
+  <rect x="90" y="110" width="6" height="10" rx="1" ry="1" fill="#10b981"/>
+  <rect x="100" y="110" width="6" height="10" rx="1" ry="1" fill="#10b981"/>
+  <rect x="110" y="110" width="6" height="10" rx="1" ry="1" fill="#10b981"/>
+  <rect x="160" y="108" width="20" height="14" rx="2" ry="2" fill="#1f2937"/>
+  
+  <!-- Server 4 -->
+  <rect x="70" y="130" width="116" height="20" rx="3" ry="3" fill="#6b7280"/>
+  <rect x="75" y="133" width="10" height="14" rx="2" ry="2" fill="#f59e0b"/>
+  <rect x="90" y="135" width="6" height="10" rx="1" ry="1" fill="#10b981"/>
+  <rect x="100" y="135" width="6" height="10" rx="1" ry="1" fill="#ef4444"/>
+  <rect x="110" y="135" width="6" height="10" rx="1" ry="1" fill="#10b981"/>
+  <rect x="160" y="133" width="20" height="14" rx="2" ry="2" fill="#1f2937"/>
+  
+  <!-- Server 5 -->
+  <rect x="70" y="155" width="116" height="20" rx="3" ry="3" fill="#6b7280"/>
+  <rect x="75" y="158" width="10" height="14" rx="2" ry="2" fill="#10b981"/>
+  <rect x="90" y="160" width="6" height="10" rx="1" ry="1" fill="#10b981"/>
+  <rect x="100" y="160" width="6" height="10" rx="1" ry="1" fill="#10b981"/>
+  <rect x="110" y="160" width="6" height="10" rx="1" ry="1" fill="#10b981"/>
+  <rect x="160" y="158" width="20" height="14" rx="2" ry="2" fill="#1f2937"/>
+  
+  <!-- Server 6 -->
+  <rect x="70" y="180" width="116" height="20" rx="3" ry="3" fill="#6b7280"/>
+  <rect x="75" y="183" width="10" height="14" rx="2" ry="2" fill="#10b981"/>
+  <rect x="90" y="185" width="6" height="10" rx="1" ry="1" fill="#10b981"/>
+  <rect x="100" y="185" width="6" height="10" rx="1" ry="1" fill="#10b981"/>
+  <rect x="110" y="185" width="6" height="10" rx="1" ry="1" fill="#f59e0b"/>
+  <rect x="160" y="183" width="20" height="14" rx="2" ry="2" fill="#1f2937"/>
+  
+  <!-- Network cables -->
+  <path d="M45 70 Q35 75 30 85 Q35 95 45 100" stroke="#3b82f6" stroke-width="3" fill="none"/>
+  <path d="M45 120 Q35 125 30 135 Q35 145 45 150" stroke="#3b82f6" stroke-width="3" fill="none"/>
+  <path d="M211 90 Q221 95 226 105 Q221 115 211 120" stroke="#3b82f6" stroke-width="3" fill="none"/>
+  <path d="M211 140 Q221 145 226 155 Q221 165 211 170" stroke="#3b82f6" stroke-width="3" fill="none"/>
+  
+  <!-- Management symbol -->
+  <circle cx="128" cy="32" r="20" fill="#f59e0b" stroke="#d97706" stroke-width="2"/>
+  <path d="M118 27 L128 22 L138 27 L138 37 L128 42 L118 37 Z" fill="#ffffff"/>
+  <circle cx="128" cy="32" r="4" fill="#d97706"/>
+  
+  <!-- Status indicators -->
+  <circle cx="40" cy="45" r="6" fill="#10b981"/>
+  <circle cx="216" cy="45" r="6" fill="#f59e0b"/>
+  
+  <!-- Subtle reflection -->
+  <ellipse cx="128" cy="60" rx="50" ry="8" fill="rgba(255,255,255,0.1)"/>
+</svg>
