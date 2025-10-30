@@ -12,6 +12,7 @@
 	<RuntimeIdentifier>win-x64</RuntimeIdentifier>
 	<PublishSingleFile>true</PublishSingleFile>
 	<PublishReadyToRun>true</PublishReadyToRun>
+	<EnableWindowsTargeting>true</EnableWindowsTargeting>
 	<ApplicationIcon>datacenter_icon.ico</ApplicationIcon>
   </PropertyGroup>
 
